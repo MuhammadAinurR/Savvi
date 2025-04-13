@@ -1,64 +1,115 @@
-# Backup WordPress files
+# Backup and Restore Guide for WordPress and Database
 
+## Backup WordPress Files
+
+```bash
 docker run --rm -v savvi_wordpress_data:/volume -v "${PWD}:/backup" alpine sh -c "cd /volume && tar -czvf /backup/wordpress_data.tar.gz ."
+```
 
-# Backup Database
+## Backup Database
 
+```bash
 docker run --rm -v savvi_db_data:/volume -v "${PWD}:/backup" alpine sh -c "cd /volume && tar -czvf /backup/db_data.tar.gz ."
+```
 
-# Restore WordPress files
+## Restore WordPress Files
 
+```bash
 docker run --rm -v savvi_wordpress_data:/volume -v "${PWD}:/backup" alpine sh -c "cd /volume && tar -xzvf /backup/wordpress_data.tar.gz"
+```
 
-# Restore Database
+## Restore Database
 
+```bash
 docker run --rm -v savvi_db_data:/volume -v "${PWD}:/backup" alpine sh -c "cd /volume && tar -xzvf /backup/db_data.tar.gz"
+```
 
-setup new machine
-sudo apt update
-sudo apt install -y docker.io
-sudo systemctl enable docker
-sudo systemctl start docker
-sudo apt install -y docker-compose
-sudo docker-compose up -d
-sudo docker-compose down
-sudo docker run --rm -v savvi_wordpress_data:/volume -v "${PWD}:/backup" alpine sh -c "cd /volume && tar -xzvf /backup/wordpress_data.tar.gz"
-sudo docker run --rm -v savvi_db_data:/volume -v "${PWD}:/backup" alpine sh -c "cd /volume && tar -xzvf /backup/db_data.tar.gz"
-sudo docker-compose up -d
-sudo docker-compose restart
+---
 
-how to change the home address path
-Step 1: Copy the wp-config.php file from the container to your local machine
-Run this command to copy the wp-config.php file from the container to your local machine:
+# Setting Up a New Machine
 
-bash
+1. Update the system and install Docker:
+    ```bash
+    sudo apt update
+    sudo apt install -y docker.io
+    sudo systemctl enable docker
+    sudo systemctl start docker
+    ```
+
+2. Install Docker Compose:
+    ```bash
+    sudo apt install -y docker-compose
+    ```
+
+3. Start the containers:
+    ```bash
+    sudo docker-compose up -d
+    ```
+
+4. Stop the containers:
+    ```bash
+    sudo docker-compose down
+    ```
+
+5. Restore WordPress files:
+    ```bash
+    sudo docker run --rm -v savvi_wordpress_data:/volume -v "${PWD}:/backup" alpine sh -c "cd /volume && tar -xzvf /backup/wordpress_data.tar.gz"
+    ```
+
+6. Restore the database:
+    ```bash
+    sudo docker run --rm -v savvi_db_data:/volume -v "${PWD}:/backup" alpine sh -c "cd /volume && tar -xzvf /backup/db_data.tar.gz"
+    ```
+
+7. Restart the containers:
+    ```bash
+    sudo docker-compose up -d
+    sudo docker-compose restart
+    ```
+
+---
+
+# Changing the Home Address Path
+
+## Step 1: Copy the `wp-config.php` File
+
+Run the following command to copy the `wp-config.php` file from the container to your local machine:
+
+```bash
 sudo docker cp wordpress:/var/www/html/wp-config.php ./wp-config.php
-This will copy the wp-config.php file from the WordPress container to your current directory on your host machine.
+```
 
-Step 2: Edit the wp-config.php file
-Now, open the wp-config.php file with any text editor of your choice (like nano, vim, or any code editor):
+## Step 2: Edit the `wp-config.php` File
 
-bash
+Open the `wp-config.php` file with a text editor of your choice:
+
+```bash
 nano wp-config.php
-Or use a graphical code editor (VSCode, Sublime, etc.).
+```
 
-Step 3: Add the Site URL Definitions
-In the wp-config.php file, above the line:
+Or use a graphical code editor like VSCode or Sublime.
 
-/* That's all, stop editing! Happy publishing. */
-Add:
+## Step 3: Add the Site URL Definitions
 
+Add the following lines above the line `/* That's all, stop editing! Happy publishing. */`:
+
+```php
 define('WP_HOME', 'http://103.150.196.34:8080');
 define('WP_SITEURL', 'http://103.150.196.34:8080');
+```
 
-Step 4: Copy the modified wp-config.php file back to the container
-After saving the file, copy it back into the container:
+## Step 4: Copy the Modified `wp-config.php` File Back to the Container
 
-bash
+Save the file and copy it back to the container:
+
+```bash
 sudo docker cp ./wp-config.php wordpress:/var/www/html/wp-config.php
+```
 
-Step 5: Restart the WordPress container
-Finally, restart the WordPress container to apply the changes:
+## Step 5: Restart the WordPress Container
 
-bash
+Restart the WordPress container to apply the changes:
+
+```bash
 sudo docker-compose restart
+```
